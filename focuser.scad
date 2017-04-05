@@ -20,7 +20,7 @@ difference()
         rotate([0,0,0]) translate([0,0,-(28+4+1)])
         {
             cylinder(h=28+4+1-15,d=7);
-            cylinder(h=2,r1=4,r2=2);
+            //cylinder(h=2,r1=4,r2=2);
         }
         rotate([-180,0,0]) translate([0,0,-(28+4+1)])
         {
