@@ -3,7 +3,18 @@ include <motors/28byj-48.scad>
 module connector_block() difference()
 //union()
 {
-    cylinder(h=30,d=28+4);
+    union()
+    {
+        difference()
+        {
+            cylinder(h=30,d=28+4);
+            scale(1.05) translate([0,0,12]) cylinder(h=30,d=28);
+        }
+        rotate([0,0,0]) translate([0,28/2,15]) cube([8,1,30], center=true);
+        rotate([0,0,90]) translate([0,28/2,15]) cube([6,1,30], center=true);
+        rotate([0,0,180]) translate([0,28/2,15]) cube([8,1,30], center=true);
+        rotate([0,0,270]) translate([0,28/2,15]) cube([6,1,30], center=true);
+    }
     scale(1.05) union()
     {
         translate([0,0,-1])
@@ -13,7 +24,6 @@ module connector_block() difference()
             translate([0,0,10]) cylinder(h=4+1,d=9);
             translate([-2.5,-1.5,0]) cube([5,3,10+1]);
         }
-        translate([0,0,12]) cylinder(h=30,d=28);
     }
     #color("red") rotate([90,0,0]) translate([0,10-3,0])
     {
@@ -22,10 +32,10 @@ module connector_block() difference()
     
     #color("blue") 
     {
-        rotate([0,0,0]) translate([0,28/2+1,15]) cube([6,2,30.5], center=true);
-        rotate([0,0,90]) translate([0,28/2+1,15]) cube([4,2,30.5], center=true);
-        rotate([0,0,180]) translate([0,28/2+1,15]) cube([6,2,30.5], center=true);
-        rotate([0,0,270]) translate([0,28/2+1,15]) cube([4,2,30.5], center=true);
+        rotate([0,0,0]) translate([0,28/2+1,15]) cube([6,4,30.5], center=true);
+        rotate([0,0,90]) translate([0,28/2+1,15]) cube([4,4,30.5], center=true);
+        rotate([0,0,180]) translate([0,28/2+1,15]) cube([6,4,30.5], center=true);
+        rotate([0,0,270]) translate([0,28/2+1,15]) cube([4,4,30.5], center=true);
     }
 }
 
