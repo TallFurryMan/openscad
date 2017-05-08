@@ -1,6 +1,6 @@
 include <motors/28byj-48.scad>
 
-M3_d=2.5;
+M3_d=3; // 2.5 is printed too narrow
 
 module connector_block() difference()
 {
@@ -68,17 +68,18 @@ module lock() union()
 
 module focuser_knobs()
 {
+    offset=24;
     //connector_block();
     translate([0,0,axis_slack])
     {
         // Millimetric knob
-        translate([0,0,15]) cylinder(h=18,d=26);
+        translate([0,0,offset]) cylinder(h=18,d=26);
         // Main knob
-        translate([0,0,15+18]) cylinder(h=19,d=45);
+        translate([0,0,offset+18]) cylinder(h=15,d=45);
         // Axis knob block narrow
-        translate([0,0,15+18+19]) cylinder(h=8,d=25);
+        translate([0,0,offset+18+15]) cylinder(h=8,d=25);
         // Axis knob block larger
-        translate([0,0,15+18+19+8]) difference()
+        translate([0,0,offset+18+15+8]) difference()
         {
             cylinder(h=7,d=29);
             #translate([0,0,7-3.5/2])
@@ -96,7 +97,7 @@ stepper_center = 20;
 // Slack to mount system
 axis_slack=8;
 width=50;
-length=65+axis_slack;
+length=45+axis_slack;
 // Back holder width
 hol_w=7;
 difference()
@@ -116,7 +117,7 @@ difference()
                 {
                     translate([width/4,12,-1])
                         cube([width/2,length-15-hol_w,1]);
-                    cylinder(h=7,d=15,$fn=24);
+                    cylinder(h=7,d=8,$fn=4);
                 }
                 // Screw holes
                 #translate([0,0,-1])
@@ -129,7 +130,7 @@ difference()
             }
             // Straighteners
             str_w=3;
-            str_h=5;
+            str_h=10;
             translate([0,0,5]) difference()
             {
                 union()
@@ -139,8 +140,8 @@ difference()
                     translate([width-str_w,0,0]) cube([str_w,length+1,str_h]);
                 }
                 // Screw holes
-                #translate([-1,15,2.5]) rotate([0,90,0])
-                    for(x = [0:15:width])
+                #translate([-1,15,str_h/2]) rotate([0,90,0])
+                    for(x = [0:15:length*0.8])
                         translate([0,x,0]) cylinder(h=width+2,d=M3_d,$fn=12);
             }
         }
@@ -150,11 +151,12 @@ difference()
         {
             union() translate([0,stepper_center-30,0])
             {
-                cube([width,25,hol_w]);
+                cube([width,25,hol_w*2]);
                 translate([width/2,25,0])
-                    cylinder(h=hol_w,d=width);
+                    cylinder(h=hol_w*2,d=width);
             }
             // Screws holes
+            /*
             #translate([width/2,stepper_center,hol_w/2]) rotate([-90,0,0]) 
             {
                 tube_l=70;
@@ -167,6 +169,12 @@ difference()
                     translate([0,0,-tube_l/2])
                         cylinder(h=tube_l,d=M3_d,$fn=12);
             }
+            */
+            // Space for Stepper cables
+            //#translate([-10/2,-15/2,stepper_center-30+10/2+1]) cube([10,10,10]);
+            percent=0.35;
+            #translate([width*(1-percent)/2,50,-1])
+                rotate([90,0,0]) cube([width*percent,hol_w*2+2,60]);
         }
 
         // Block holder
@@ -179,16 +187,28 @@ difference()
                     union()
                     {
                         translate([-width/2,0,0])
+                        {
                             cube([width,38,hol_w]);
+                            translate([width*0.2/2,0,0])
+                                cube([width*0.8,68,hol_w]);
+                        }
                         translate([0,38,0])
                             cylinder(h=hol_w,d=width);
                     }
+                    // Locker
+                    #translate([-width/2,62,hol_w/2])
+                        rotate([0,90,0])
+                        {
+                            cylinder(h=width,d=M3_d,$fn=12);
+                            translate([0,0,width/2])
+                                cylinder(h=width/2,d=M3_d+1,$fn=12);
+                        }
                     // Narrow axis space
-                    #translate([0,40,hol_w/2])
+                    #translate([0,45,hol_w/2])
                         scale(1.05)
                             cube([25,45,hol_w+2],center=true);
                     #translate([0,38,-1])
-                        scale(1.05)
+                        scale(1.01) // 1.05 too large
                             cylinder(h=hol_w+2,d=29);
                     // Screws
                     #translate([0,38,hol_w/2]) rotate([-90,0,0]) 
@@ -227,22 +247,25 @@ difference()
     // Stepper location - we're interested in the larger shaft only, not the axis
     translate([0,-18,stepper_center])
         rotate([90,0,180])
-            scale(1.05)
+            scale([1.01,1.01,1.2]) // 1.05 too large, but leave space for cables
                 stepper_28BYJ_48();
     // Stepper locks
-    #translate([35/2,0,stepper_center])
+    #translate([35/2,-hol_w,stepper_center])
         rotate([90,0,0])
-            cylinder(h=15,d=M3_d,center=true,$fn=12);
-    #translate([-35/2,0,stepper_center])
+        {
+            cylinder(h=hol_w*3,d=M3_d,center=true,$fn=12);
+            translate([0,0,-length-10]) cylinder(h=hol_w*3,d=2*M3_d,center=true,$fn=12);
+        }
+    #translate([-35/2,-hol_w,stepper_center])
         rotate([90,0,0])
-            cylinder(h=15,d=M3_d,center=true,$fn=12);
-    // Space for Stepper cables
-    //#translate([-10/2,-15/2,stepper_center-30+10/2+1]) cube([10,10,10]);
-    #translate([-23/2,-8,stepper_center-30-1]) cube([23,10,60]);
+        {
+            cylinder(h=hol_w*3,d=M3_d,center=true,$fn=12);
+            translate([0,0,-length-10]) cylinder(h=hol_w*3,d=2*M3_d,center=true,$fn=12);
+        }
 }
 
 // The bottom cover
-translate([-100,0,0])
+%translate([-100,0,0])
 {
     difference()
     {
