@@ -243,7 +243,7 @@ difference()
                 focuser_knobs();
     
     // Remove everything under the models
-    #translate([-width/2-1,-50,-20]) cube([width+2,length*2,20]);
+    #translate([-width/2-1,-length/2,-20]) cube([width+2,length*2,20]);
     // Stepper location - we're interested in the larger shaft only, not the axis
     translate([0,-18,stepper_center])
         rotate([90,0,180])
