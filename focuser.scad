@@ -1,6 +1,7 @@
 include <motors/28byj-48.scad>
 
 M3_d=3; // 2.5 is printed too narrow
+M2_d=1.6*(3/2.5); // 1.6 enlarged in same proportions
 
 module connector_block() difference()
 {
@@ -243,7 +244,7 @@ difference()
                 focuser_knobs();
     
     // Remove everything under the models
-    #translate([-width/2-1,-length/2,-20]) cube([width+2,length*2,20]);
+    translate([-width/2-1,-length/2,-20]) cube([width+2,length*2,20]);
     // Stepper location - we're interested in the larger shaft only, not the axis
     translate([0,-18,stepper_center])
         rotate([90,0,180])
@@ -265,58 +266,79 @@ difference()
 }
 
 // The bottom cover
-%translate([-100,0,0])
+%translate([-80,0,0])
 {
     difference()
     {
-        translate([width/2,length/2,10/2]) minkowski()
+        translate([width/2,length/2,0]) union()
         {
-            cube([width-5,length-5,10], center=true);
-            cylinder(h=2,d=5,$fn=24);
-            /*
             minkowski()
             {
-                translate([width/4,12,1])
-                    cube([width/2,length-15-hol_w,1]);
-                cylinder(h=2,d=14,$fn=24);
+                cube([width-9,length-5,1], center=true);
+                //translate([-width/2-2/2,-length/2+2/2,0]) cube([width+2,8+2,20]);
+                //translate([width-12+1,-1,0]) cube([12,8,20]);
+                //translate([-width/2-2/2,+length/2-2/2,0]) cube([width+2,8+2,20]);
+                //translate([width-12+1,length-8+1,0]) cube([12,8,20]);
+                cylinder(h=1,d=5,$fn=8);
+                //sphere(d=5,$fn=8);
             }
-            */
-        }
-        
-        // Borders
-        #translate([0,0,2])
-        {
-            translate([-1,-1,0]) cube([12,8,20]);
-            translate([width-12+1,-1,0]) cube([12,8,20]);
-            translate([-1,length-8+1,0]) cube([12,8,20]);
-            translate([width-12+1,length-8+1,0]) cube([12,8,20]);
-        }
-        
-        // ULN driver
-        #translate([width/2,27+0.5,10])
-        {
-            scale(1.05) cube([35,37,10], center=true);
-        }
-        
-        // Arduino Nano v3
-        #translate([width/2,56,10])
-        {
-            scale(1.05) cube([43,18,15], center=true);
-            // BUGBUG
-            translate([0,0,10]) scale(1.05) cube([50,10,7], center=true);
+            minkowski()
+            {
+                translate([0,0,10/2+1]) cube([width-18,length-18,12], center=true);
+                cylinder(h=1,d=5,$fn=8);
+            }
+            //translate([-width/2,0,0]) cube([18,43,15], center=true);
         }
 
+        // Room for stepper
+        #translate([width*0.5,2,0]) cube([width*0.5,6,5], center=true);
+
+        // ULN driver
+        #translate([width/2,length/2,-0.1]) rotate([0,0,90]) union()
+        {
+            w=35; h=32;
+            translate([0,0,5/2]) scale(1.01) cube([w,h,5], center=true);
+            translate([0,0,10/2]) scale(1.01) cube([26,28,10], center=true);
+            // Holes are weird - x at 1.7, y at 3 from border
+            translate([-w/2+1.7,-h/2+3,0]) cylinder(h=15,d=M3_d,$fn=12);
+            translate([+w/2-1.7,+h/2-3,0]) cylinder(h=15,d=M3_d,$fn=12);
+            translate([-w/2+1.7,+h/2-3,0]) cylinder(h=15,d=M3_d,$fn=12);
+            translate([+w/2-1.7,-h/2+3,0]) cylinder(h=15,d=M3_d,$fn=12);
+            // Connector spaces
+            translate([0,-h/2+2,0]) cube([6,15,20]);
+            translate([-w/2+5,-h/2+5,0]) cube([4,10,20]);
+            // Led holes
+            translate([10,-h/2+5,0]) cylinder(d=5,h=20);
+            translate([10,-h/2+10,0]) cylinder(d=5,h=20);
+            translate([10,-h/2+15,0]) cylinder(d=5,h=20);
+            translate([10,-h/2+20,0]) cylinder(d=5,h=20);
+        }
+        
         // Screw holes
-        #translate([0,0,-1])
+        #translate([0,0,-1]) union()
         {
             translate([5,3,0]) cylinder(h=10,d=M3_d,$fn=12);
             translate([width-5,3,0]) cylinder(h=10,d=M3_d,$fn=12);
             translate([5,length-3,0]) cylinder(h=10,d=M3_d,$fn=12);
             translate([width-5,length-3,0]) cylinder(h=10,d=M3_d,$fn=12);
         }
+        
+        // Remove everything under the models
+        translate([-1,-length/2,-20]) cube([width+2,length*2,20]);
     }
 }    
 
+/*{
+    {
+        // Arduino Nano v3
+        #translate([width/2,36,-0.1]) union()
+        {
+            scale(1.01) cube([43,18,15], center=true);
+            // BUGBUG
+            //translate([0,0,10]) scale(1.01) cube([50,10,7], center=true);
+        }
+    }
+}*/
 
 
 %translate([0,-18,stepper_center])
