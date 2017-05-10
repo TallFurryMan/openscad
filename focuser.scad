@@ -101,7 +101,7 @@ width=50;
 length=45+axis_slack;
 // Back holder width
 hol_w=7;
-difference()
+%difference()
 {
     axis_offset = 17;
     
@@ -266,8 +266,11 @@ difference()
 }
 
 // The bottom cover
-translate([-80,0,0])
+translate([-80,0,0]) union()
 {
+    // Brim
+    //translate([0,0,0]) cylinder(h=2,d=4);
+
     difference()
     {
         translate([width/2,length/2,0]) union()
@@ -284,33 +287,35 @@ translate([-80,0,0])
             }
             minkowski()
             {
-                translate([0,0,10/2+1]) cube([width-18,length-18,12], center=true);
+                translate([0,0,10/2+1]) cube([width-18,length-15,14], center=true);
                 cylinder(h=1,d=5,$fn=8);
             }
         }
 
-        // Room for stepper
-        #translate([width*0.5,2,0]) cube([width*0.5,6,5], center=true);
+        // Room for stepper - mirrored just because
+        #translate([width*0.5,2,0]) cube([width*0.5,7,5], center=true);
+        #translate([width*0.5,length-2,0]) cube([width*0.5,7,5], center=true);
 
-        // ULN driver
-        #translate([width/2,length/2,-0.1]) rotate([0,0,90]) union()
+        // ULN driver - was inverted! so added mirror()
+        #translate([width/2,length/2,-0.1]) rotate([0,0,90]) mirror([0,1,0]) union()
         {
             w=35; h=32;
-            translate([0,0,5/2]) scale(1.01) cube([w,h,5], center=true);
-            translate([0,0,10/2]) scale(1.01) cube([26,28,10], center=true);
+            translate([0,0,5/2]) scale(1.01) cube([w+1,h+1,5], center=true);
+            translate([-7/2,0,15/2]) scale(1.01) cube([26-7,28,10], center=true);
             // Holes are weird - x at 1.7, y at 3 from border
+            // Adjusted 1.7 at 2.2 for top holes after first iteration
             translate([-w/2+1.7,-h/2+3,0]) cylinder(h=15,d=M3_d,$fn=12);
-            translate([+w/2-1.7,+h/2-3,0]) cylinder(h=15,d=M3_d,$fn=12);
+            translate([+w/2-2.2,+h/2-3,0]) cylinder(h=15,d=M3_d,$fn=12);
             translate([-w/2+1.7,+h/2-3,0]) cylinder(h=15,d=M3_d,$fn=12);
-            translate([+w/2-1.7,-h/2+3,0]) cylinder(h=15,d=M3_d,$fn=12);
+            translate([+w/2-2.2,-h/2+3,0]) cylinder(h=15,d=M3_d,$fn=12);
             // Connector spaces
             translate([0,-h/2+2,0]) cube([6,15,20]);
-            translate([-w/2+5,-h/2+5,0]) cube([4,10,20]);
+            translate([-w/2+5,-h/2+4,0]) cube([4,12,20]);
             // Led holes
-            translate([10,-h/2+5,0]) cylinder(d=5,h=20);
-            translate([10,-h/2+10,0]) cylinder(d=5,h=20);
-            translate([10,-h/2+15,0]) cylinder(d=5,h=20);
-            translate([10,-h/2+20,0]) cylinder(d=5,h=20);
+            translate([10,-h/2+4,0]) cylinder(d=4,h=20);
+            translate([10,-h/2+9,0]) cylinder(d=4,h=20);
+            translate([10,-h/2+14,0]) cylinder(d=4,h=20);
+            translate([10,-h/2+19,0]) cylinder(d=4,h=20);
         }
         
         // Screw holes
@@ -325,7 +330,7 @@ translate([-80,0,0])
         // Remove everything under the models
         translate([-1,-length/2,-20]) cube([width+2,length*2,20]);
     }
-}    
+}
 
 // The Arduino box
 translate([-120,0,0])
@@ -376,7 +381,7 @@ translate([-120,0,0])
     }
 
     // Cover
-    translate([-35,0,0]) difference()
+    translate([-35,0,0]) scale([1.01,1,1]) difference()
     {
         union()
         {
@@ -386,16 +391,16 @@ translate([-120,0,0])
                 cylinder(h=1,d=5,$fn=8);
             }
             // Ears
-            translate([-4,pcb_l/2+15,0]) cube([2,10,6]);
-            translate([-3+1,pcb_l/2+15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.75,$fn=8);
-            translate([26-4,pcb_l/2+15,0]) cube([2,10,6]);
-            translate([24-3+1,pcb_l/2+15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.75,$fn=8);
-            translate([-4,pcb_l/2-15,0]) cube([2,10,6]);
-            translate([-3+1,pcb_l/2-15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.75,$fn=8);
-            translate([26-4,pcb_l/2-15,0]) cube([2,10,6]);
-            translate([24-3+1,pcb_l/2-15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.75,$fn=8);
-            // USB catch-up
-            translate([20/2,1.5,2.5]) cube([10.5,3,1.5], center=true);
+            translate([-3,pcb_l/2+15,0]) cube([1,10,5]);
+            translate([-3+1,pcb_l/2+15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
+            translate([26-4,pcb_l/2+15,0]) cube([1,10,5]);
+            translate([24-3+1,pcb_l/2+15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
+            translate([-3,pcb_l/2-15,0]) cube([1,10,5]);
+            translate([-3+1,pcb_l/2-15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
+            translate([26-4,pcb_l/2-15,0]) cube([1,10,5]);
+            translate([24-3+1,pcb_l/2-15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
+            // USB catch-up - higher, as USB plug doesn't get it the hole actually
+            translate([20/2,1.5,4]) cube([10.5,3,4.1], center=true);
         }
         // Led space
         #translate([20/2,29+5/2,0]) cube([11,3,5], center=true);
