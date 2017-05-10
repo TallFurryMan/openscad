@@ -266,7 +266,7 @@ hol_w=7;
 }
 
 // The bottom cover
-translate([-80,0,0]) union()
+*translate([-80,0,0]) union()
 {
     // Brim
     //translate([0,0,0]) cylinder(h=2,d=4);
@@ -342,7 +342,7 @@ translate([-120,0,0])
     pcb_h=2; pcb_w=18; pcb_l=48;
     icsp_h=11;
     //translate([width/2,length/2,-0.1])
-    difference()
+    *difference()
     {
         translate([0,5/2,-2]) union()
         {
@@ -403,9 +403,9 @@ translate([-120,0,0])
             translate([20/2,1.5,4]) cube([10.5,3,4.1], center=true);
         }
         // Led space
-        #translate([20/2,29+5/2,0]) cube([11,3,5], center=true);
+        #translate([20/2,30+5/2,0]) cube([11,3,5], center=true);
         // Reset hole
-        #translate([20/2,24+5/2,-5/2]) cylinder(h=5,d=2,$fn=8);
+        #translate([20/2,26+5/2,-5/2]) cylinder(h=5,d=2,$fn=8);
         // Remove everything under the models
         translate([-5,-length/2,-20]) cube([width,length*2,20]);
     }
