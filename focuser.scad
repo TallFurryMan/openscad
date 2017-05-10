@@ -150,7 +150,7 @@ difference()
         // Stepper holder
         color("green") rotate([90,0,0]) difference()
         {
-            union() translate([0,stepper_center-30,0])
+            translate([0,stepper_center-30,0]) union() 
             {
                 cube([width,25,hol_w*2]);
                 translate([width/2,25,0])
@@ -266,7 +266,7 @@ difference()
 }
 
 // The bottom cover
-%translate([-80,0,0])
+translate([-80,0,0])
 {
     difference()
     {
@@ -287,7 +287,6 @@ difference()
                 translate([0,0,10/2+1]) cube([width-18,length-18,12], center=true);
                 cylinder(h=1,d=5,$fn=8);
             }
-            //translate([-width/2,0,0]) cube([18,43,15], center=true);
         }
 
         // Room for stepper
@@ -328,18 +327,84 @@ difference()
     }
 }    
 
-/*{
+// The Arduino box
+translate([-120,0,0])
+{
+    width=32;
+    length=49;
+    // Arduino Nano v3
+    pin_h=8; pin_w=4;
+    pcb_h=2; pcb_w=18; pcb_l=48;
+    icsp_h=11;
+    //translate([width/2,length/2,-0.1])
+    difference()
     {
-        // Arduino Nano v3
-        #translate([width/2,36,-0.1]) union()
+        translate([0,5/2,-2]) union()
         {
-            scale(1.01) cube([43,18,15], center=true);
-            // BUGBUG
-            //translate([0,0,10]) scale(1.01) cube([50,10,7], center=true);
+            // BUGBUG: minkowski of union results in non-manifold
+            minkowski()
+            {
+                cube([20,length,21]);
+                cylinder(h=1,d=5,$fn=8);
+            }
+            minkowski()
+            {
+                cube([width,length,3]);
+                cylinder(h=1,d=5,$fn=8);
+            }
         }
+        // Ears
+        #translate([-3,pcb_l/2,21-5]) union()
+            for(xyz = [[0,15,0],[24,15,0],[0,-15,0],[24,-15,0]])
+                translate(xyz) cube([2,10,2]);
+        // Inners
+        #scale(1.01) union()
+        {
+            // Arduino space
+            #translate([10,3+pcb_l/2,pin_h+icsp_h/2]) cube([18,pcb_l,pcb_h+icsp_h], center=true);
+            #translate([10-pcb_w/2+pin_w/2,3+pcb_l/2,pin_h/2-1/2]) cube([pin_w,pcb_l,pin_h], center=true);
+            #translate([10+pcb_w/2-pin_w/2,3+pcb_l/2,pin_h/2-1/2]) cube([pin_w,pcb_l,pin_h], center=true);
+            // USB plug
+            #translate([10,pcb_l/2-1,14+1]) cube([11,pcb_l,10], center=true);
+        }
+        // Screw holes
+        #translate([30,15,-1])
+            for(x = [0:15:length*0.8])
+                translate([0,x,0]) cylinder(h=10,d=M3_d,$fn=12);
+        // Remove everything under the models
+        translate([-5,-length/2,-20]) cube([width+5*2,length*2,20]);
     }
-}*/
 
+    // Cover
+    translate([-35,0,0]) difference()
+    {
+        union()
+        {
+            translate([0,5/2,-2]) minkowski()
+            {
+                cube([20,length,3]);
+                cylinder(h=1,d=5,$fn=8);
+            }
+            // Ears
+            translate([-4,pcb_l/2+15,0]) cube([2,10,6]);
+            translate([-3+1,pcb_l/2+15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.75,$fn=8);
+            translate([26-4,pcb_l/2+15,0]) cube([2,10,6]);
+            translate([24-3+1,pcb_l/2+15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.75,$fn=8);
+            translate([-4,pcb_l/2-15,0]) cube([2,10,6]);
+            translate([-3+1,pcb_l/2-15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.75,$fn=8);
+            translate([26-4,pcb_l/2-15,0]) cube([2,10,6]);
+            translate([24-3+1,pcb_l/2-15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.75,$fn=8);
+            // USB catch-up
+            translate([20/2,1.5,2.5]) cube([10.5,3,1.5], center=true);
+        }
+        // Led space
+        #translate([20/2,29+5/2,0]) cube([11,3,5], center=true);
+        // Reset hole
+        #translate([20/2,24+5/2,-5/2]) cylinder(h=5,d=2,$fn=8);
+        // Remove everything under the models
+        translate([-5,-length/2,-20]) cube([width,length*2,20]);
+    }
+}
 
 %translate([0,-18,stepper_center])
     rotate([90,0,180])
