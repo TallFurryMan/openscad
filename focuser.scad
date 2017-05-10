@@ -293,8 +293,8 @@ translate([-80,0,0]) union()
         }
 
         // Room for stepper - mirrored just because
-        #translate([width*0.5,2,0]) cube([width*0.5,7,5], center=true);
-        #translate([width*0.5,length-2,0]) cube([width*0.5,7,5], center=true);
+        #translate([width*0.5,1,0]) cube([width*0.5,7,5], center=true);
+        #translate([width*0.5,length-1,0]) cube([width*0.5,7,5], center=true);
 
         // ULN driver - was inverted! so added mirror()
         #translate([width/2,length/2,-0.1]) rotate([0,0,90]) mirror([0,1,0]) union()
