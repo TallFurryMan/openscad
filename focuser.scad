@@ -373,7 +373,7 @@ module arduino_box()
             translate([10,pcb_l/2-1,14+1]) cube([11,pcb_l,10], center=true);
         }
         // Cover
-        translate([20/2,0,16])
+        translate([20/2+0.001,0,16-0.001])
             rotate([0,180,0])
                 translate([0,0,0])
                     arduino_cover();
@@ -447,7 +447,7 @@ module arduino_cover()
     rotate([90,0,180])
         stepper_28BYJ_48();
 
-translate([-80,0,0]) bottom_cover();
+*translate([-80,0,0]) bottom_cover();
 translate([-120,0,0]) arduino_box();
 translate([-150,0,2]) arduino_cover();
 *translate([60,0,0]) connector_block();
