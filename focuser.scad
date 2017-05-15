@@ -1,4 +1,4 @@
-include <motors/28byj-48.scad>
+use <motors/28byj-48.scad>
 
 M3_d=3; // 2.5 is printed too narrow
 M2_d=1.6*(3/2.5); // 1.6 enlarged in same proportions
@@ -101,7 +101,7 @@ width=50;
 length=45+axis_slack;
 // Back holder width
 hol_w=7;
-%difference()
+module focuser_holder() difference()
 {
     axis_offset = 17;
     
@@ -266,7 +266,7 @@ hol_w=7;
 }
 
 // The bottom cover
-*translate([-80,0,0]) union()
+module bottom_cover() union()
 {
     // Brim
     //translate([0,0,0]) cylinder(h=2,d=4);
@@ -333,90 +333,123 @@ hol_w=7;
 }
 
 // The Arduino box
-translate([-120,0,0])
+module arduino_box()
 {
     width=32;
-    length=49;
+    length=45;
     // Arduino Nano v3
-    pin_h=8; pin_w=4;
-    pcb_h=2; pcb_w=18; pcb_l=48;
+    pin_h=8; pin_w=3;
+    pcb_h=2; pcb_w=18; pcb_l=45;
     icsp_h=11;
     //translate([width/2,length/2,-0.1])
-    *difference()
+    difference()
     {
-        translate([0,5/2,-2]) union()
+        translate([2,5/2,]) union()
         {
-            // BUGBUG: minkowski of union results in non-manifold
             minkowski()
             {
-                cube([20,length,21]);
+                union()
+                {
+                    cube([16,pcb_l,15]);
+                    translate([-4,pcb_l/2,15/2])
+                        cube([3,2,15], center=true);
+                }
                 cylinder(h=1,d=5,$fn=8);
             }
-            minkowski()
+            translate([21.5,2.5,0]) rotate([0,-90,0]) minkowski()
             {
-                cube([width,length,3]);
+                cube([width*0.9,length-5,2]);
                 cylinder(h=1,d=5,$fn=8);
             }
         }
-        // Ears
-        #translate([-3,pcb_l/2,21-5]) union()
-            for(xyz = [[0,15,0],[24,15,0],[0,-15,0],[24,-15,0]])
-                translate(xyz) cube([2,10,2]);
         // Inners
-        #scale(1.01) union()
+        scale(1.01) union()
         {
             // Arduino space
-            #translate([10,3+pcb_l/2,pin_h+icsp_h/2]) cube([18,pcb_l,pcb_h+icsp_h], center=true);
-            #translate([10-pcb_w/2+pin_w/2,3+pcb_l/2,pin_h/2-1/2]) cube([pin_w,pcb_l,pin_h], center=true);
-            #translate([10+pcb_w/2-pin_w/2,3+pcb_l/2,pin_h/2-1/2]) cube([pin_w,pcb_l,pin_h], center=true);
+            translate([10,3+pcb_l/2,pin_h+icsp_h/2]) cube([18,pcb_l,pcb_h+icsp_h], center=true);
+            translate([10-pcb_w/2+pin_w/2,3+pcb_l/2,pin_h/2-1/2]) cube([pin_w,pcb_l,pin_h], center=true);
+            translate([10+pcb_w/2-pin_w/2,3+pcb_l/2,pin_h/2-1/2]) cube([pin_w,pcb_l,pin_h], center=true);
             // USB plug
-            #translate([10,pcb_l/2-1,14+1]) cube([11,pcb_l,10], center=true);
+            translate([10,pcb_l/2-1,14+1]) cube([11,pcb_l,10], center=true);
         }
+        // Cover
+        translate([20/2,0,16])
+            rotate([0,180,0])
+                translate([0,0,0])
+                    arduino_cover();
+        // Cover screw hole
+        #translate([-3,pcb_l/2+5/2,-5/2])
+            cylinder(d=M3_d,h=22,$fn=8);
         // Screw holes
-        #translate([30,15,-1])
-            for(x = [0:15:length*0.8])
-                translate([0,x,0]) cylinder(h=10,d=M3_d,$fn=12);
+        #translate([25,0,0])
+            rotate([0,-90,0])
+                translate([25,10,0])
+                    for(x = [0:15:length*0.8])
+                        translate([0,x,0]) cylinder(h=10,d=M3_d,$fn=12);
         // Remove everything under the models
-        translate([-5,-length/2,-20]) cube([width+5*2,length*2,20]);
-    }
-
-    // Cover
-    translate([-35,0,0]) scale([1.01,1,1]) difference()
-    {
-        union()
-        {
-            translate([0,5/2,-2]) minkowski()
-            {
-                cube([20,length,3]);
-                cylinder(h=1,d=5,$fn=8);
-            }
-            // Ears
-            translate([-3,pcb_l/2+15,0]) cube([1,10,5]);
-            translate([-3+1,pcb_l/2+15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
-            translate([26-4,pcb_l/2+15,0]) cube([1,10,5]);
-            translate([24-3+1,pcb_l/2+15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
-            translate([-3,pcb_l/2-15,0]) cube([1,10,5]);
-            translate([-3+1,pcb_l/2-15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
-            translate([26-4,pcb_l/2-15,0]) cube([1,10,5]);
-            translate([24-3+1,pcb_l/2-15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
-            // USB catch-up - higher, as USB plug doesn't get it the hole actually
-            translate([20/2,1.5,4]) cube([10.5,3,4.1], center=true);
-        }
-        // Led space
-        #translate([20/2,30+5/2,0]) cube([11,3,5], center=true);
-        // Reset hole
-        #translate([20/2,26+5/2,-5/2]) cylinder(h=5,d=2,$fn=8);
-        // Remove everything under the models
-        translate([-5,-length/2,-20]) cube([width,length*2,20]);
+        translate([-10,-length/2,-20]) cube([width+10*2,length*2,20]);
     }
 }
 
-%translate([0,-18,stepper_center])
+module arduino_cover()
+{
+    width=32;
+    length=45;
+    // Arduino Nano v3
+    pin_h=8; pin_w=4;
+    pcb_h=2; pcb_w=18; pcb_l=45;
+    icsp_h=11;
+    cover_h=2;
+    translate([-20/2,0,-2]) difference()
+    {
+        union()
+        {
+            translate([2,5/2,0]) minkowski()
+            {
+                union()
+                {
+                    cube([16,pcb_l,cover_h-1]);
+                    translate([20,pcb_l/2,1/2])
+                        cube([3,2,cover_h-1], center=true);
+                }
+                cylinder(h=1,d=5,$fn=8);
+            }
+            // Ears
+            translate([-1,pcb_l/2+5/2,cover_h/2])
+                cube([1,10,cover_h], center=true);
+            //translate([-3,pcb_l/2+10/2,0]) cube([1,10,5]);
+            //translate([-3+1,pcb_l/2+10/2,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
+            //translate([26-4,pcb_l/2+10,0]) cube([1,10,5]);
+            //translate([24-3+1,pcb_l/2+10,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
+            //translate([-3,pcb_l/2-15,0]) cube([1,10,5]);
+            //translate([-3+1,pcb_l/2-15,2+3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
+            //translate([17.5,pcb_l/2-10/2,0]) cube([1,10,3]);
+            //translate([18+0.5,pcb_l/2-10/2,3]) rotate([-90,0,0]) cylinder(h=10,d=1.5,$fn=8);
+            // USB catch-up - higher, as USB plug doesn't get it the hole actually
+            translate([20/2,1.5,cover_h+1/2]) cube([10.5,3,1], center=true);
+        }
+        // Screw hole
+        translate([18+5,pcb_l/2+5/2,-5/2])
+            cylinder(d=M3_d,h=8,$fn=8);
+        // Led space
+        translate([20/2,30+5/2,1]) cube([11,3,cover_h+1], center=true);
+        // Reset hole
+        translate([20/2,26+5/2,-0.5]) cylinder(h=cover_h+1,d=2,$fn=8);
+        // ICSP hole
+        translate([20/2,44,1]) cube([8,6,cover_h+1], center=true);
+        // Remove everything under the models
+        //translate([-5,-length/2,-20]) cube([width,length*2,20]);
+    }
+}
+
+*focuser_holder();
+*translate([0,-18,stepper_center])
     rotate([90,0,180])
         stepper_28BYJ_48();
 
-%translate([60,0,0])
-    connector_block();
-%translate([100,0,0])
-    lock();
+translate([-80,0,0]) bottom_cover();
+translate([-120,0,0]) arduino_box();
+translate([-150,0,2]) arduino_cover();
+*translate([60,0,0]) connector_block();
+*translate([100,0,0]) lock();
 
