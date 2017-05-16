@@ -266,10 +266,12 @@ module focuser_holder() difference()
 }
 
 // The bottom cover
-module bottom_cover() union()
+module bottom_cover() rotate([0,0,0]) translate([-width/2,0,0]) union()
 {
     // Brim
     //translate([0,0,0]) cylinder(h=2,d=4);
+
+    %translate([25,26.5,-5]) bottom_inter_cover();
 
     difference()
     {
@@ -277,7 +279,7 @@ module bottom_cover() union()
         {
             minkowski()
             {
-                cube([width-9,length-5,1], center=true);
+                translate([0,0,1/2]) cube([width-9,length-5,1], center=true);
                 //translate([-width/2-2/2,-length/2+2/2,0]) cube([width+2,8+2,20]);
                 //translate([width-12+1,-1,0]) cube([12,8,20]);
                 //translate([-width/2-2/2,+length/2-2/2,0]) cube([width+2,8+2,20]);
@@ -287,21 +289,23 @@ module bottom_cover() union()
             }
             minkowski()
             {
-                translate([0,0,10/2+1]) cube([width-18,length-15,14], center=true);
-                cylinder(h=1,d=5,$fn=8);
+                translate([0,0,10/2+3]) cube([width-18,length-15,14], center=true);
+                cylinder(h=1,d1=5,d2=2,$fn=8);
             }
         }
 
         // Room for stepper - mirrored just because
-        #translate([width*0.5,1,0]) cube([width*0.5,7,5], center=true);
-        #translate([width*0.5,length-1,0]) cube([width*0.5,7,5], center=true);
+        #translate([width*0.5,1,1]) cube([width*0.5,7,3], center=true);
+        #translate([width*0.5,length-1,1]) cube([width*0.5,7,3], center=true);
 
         // ULN driver - was inverted! so added mirror()
-        #translate([width/2,length/2,-0.1]) rotate([0,0,90]) mirror([0,1,0]) union()
+        translate([width/2,length/2,-0.1]) rotate([0,0,90]) mirror([0,1,0]) union()
         {
             w=35; h=32;
-            translate([0,0,5/2]) scale(1.01) cube([w+1,h+1,5], center=true);
-            translate([-7/2,0,15/2]) scale(1.01) cube([26-7,28,10], center=true);
+            // Space for pcb
+            translate([0,0,5/2]) cube([w+1.5,h+1.5,7], center=true);
+            // Space for pcb components
+            translate([-7/2,0,15/2]) cube([26-5,29,10], center=true);
             // Holes are weird - x at 1.7, y at 3 from border
             // Adjusted 1.7 at 2.2 for top holes after first iteration
             translate([-w/2+1.7,-h/2+3,0]) cylinder(h=15,d=M3_d,$fn=12);
@@ -309,26 +313,53 @@ module bottom_cover() union()
             translate([-w/2+1.7,+h/2-3,0]) cylinder(h=15,d=M3_d,$fn=12);
             translate([+w/2-2.2,-h/2+3,0]) cylinder(h=15,d=M3_d,$fn=12);
             // Connector spaces
-            translate([0,-h/2+2,0]) cube([6,15,20]);
-            translate([-w/2+5,-h/2+4,0]) cube([4,12,20]);
+            translate([6.9,6.5,2]) cube([6,8,8]); // small resistor
+            translate([6.9,-14.5,2]) cube([6,22,5]); // extra for leds
+            translate([0.5,-h/2+2,0]) cube([6,15,20]);
+            translate([-w/2+4,-h/2+3,0]) cube([4,12,20]);
+            translate([-w/2+5,10,0]) cube([12,4,20]);
             // Led holes
-            translate([10,-h/2+4,0]) cylinder(d=4,h=20);
-            translate([10,-h/2+9,0]) cylinder(d=4,h=20);
-            translate([10,-h/2+14,0]) cylinder(d=4,h=20);
-            translate([10,-h/2+19,0]) cylinder(d=4,h=20);
+            for(ofs = [4,9,14,19])
+                translate([10,-h/2+ofs,0])
+                    cylinder(d=4.5,h=20,$fn=12);
         }
         
         // Screw holes
-        #translate([0,0,-1]) union()
+        #translate([0,0,-1/2]) union()
         {
-            translate([5,3,0]) cylinder(h=10,d=M3_d,$fn=12);
-            translate([width-5,3,0]) cylinder(h=10,d=M3_d,$fn=12);
-            translate([5,length-3,0]) cylinder(h=10,d=M3_d,$fn=12);
-            translate([width-5,length-3,0]) cylinder(h=10,d=M3_d,$fn=12);
+            translate([5,3,0]) cylinder(h=3,d=M3_d,$fn=12);
+            translate([width-5,3,0]) cylinder(h=3,d=M3_d,$fn=12);
+            translate([5,length-3,0]) cylinder(h=3,d=M3_d,$fn=12);
+            translate([width-5,length-3,0]) cylinder(h=3,d=M3_d,$fn=12);
         }
         
         // Remove everything under the models
-        translate([-1,-length/2,-20]) cube([width+2,length*2,20]);
+        //translate([-1,-length/2,-20]) cube([width+2,length*2,20]);
+    }
+}
+
+module bottom_inter_cover()
+{
+    w=35; h=32; // d=1.3*M3_d;
+    translate([0,0,2/2]) rotate([0,0,90]) difference()
+    {
+        union()
+        {
+            cube([w+1,h+1,2], center=true);
+            /*
+            translate([-w/2+1.7,-h/2+3,1]) cylinder(h=2,d=d,$fn=12);
+            translate([+w/2-2.2,+h/2-3,1]) cylinder(h=2,d=d,$fn=12);
+            translate([-w/2+1.7,+h/2-3,1]) cylinder(h=2,d=d,$fn=12);
+            translate([+w/2-2.2,-h/2+3,1]) cylinder(h=2,d=d,$fn=12);
+            */
+        }
+        translate([0,0,2]) cube([w-3,h-3,4], center=true);
+        // Holes are weird - x at 1.7, y at 3 from border
+        // Adjusted 1.7 at 2.2 for top holes after first iteration
+        translate([0,0,-3])
+            for(ofs = [[-w/2+1.7,-h/2+3,0], [+w/2-2.2,+h/2-3,0], [-w/2+1.7,+h/2-3,0], [+w/2-2.2,-h/2+3,0]])
+                translate(ofs)
+                    cylinder(h=15,d=M3_d,$fn=12);
     }
 }
 
@@ -447,9 +478,10 @@ module arduino_cover()
     rotate([90,0,180])
         stepper_28BYJ_48();
 
-*translate([-80,0,0]) bottom_cover();
-translate([-120,0,0]) arduino_box();
-translate([-150,0,2]) arduino_cover();
+translate([-55,0,16]) rotate([0,180,0]) bottom_cover();
+translate([-55,-23,0]) bottom_inter_cover();
+*translate([-120,0,0]) arduino_box();
+*translate([-150,0,2]) arduino_cover();
 *translate([60,0,0]) connector_block();
 *translate([100,0,0]) lock();
 
