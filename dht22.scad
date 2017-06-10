@@ -27,7 +27,7 @@ module DHT22()
         translate([-35/2+14,-11/2,-2])
             cube([2,11,2]);
         translate([35/2+2,0,-1])
-            cylinder(d=5,h=6,$fn=8);
+            cylinder(d=5,h=6,$fn=32);
     }
     color("red") union()
     {
