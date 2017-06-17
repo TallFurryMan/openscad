@@ -99,10 +99,11 @@ bot_screw_width=50; // Can't use that unfortunately, model is not centered...
 base_h=5;
 length=52;
 // Back holder width
-hol_w=7;
+hol_w=9;
 // Straigtheners for base
 str_w=4; str_w2=10;
 str_h=10;
+str_ext=8;
 
 module circular_M3_screws(tube_len=10,step_angle=90,radius=width/2)
 {
@@ -114,7 +115,7 @@ module circular_M3_screws(tube_len=10,step_angle=90,radius=width/2)
 
 module focuser_cover() difference()
 {
-    linear_extrude(height=length+axis_slack+hol_w*3) difference()
+    linear_extrude(height=length+axis_slack+hol_w*2) difference()
     {
         scale(1.05) union()
         {
@@ -128,13 +129,19 @@ module focuser_cover() difference()
     }
     
     // Holder side screws
-    #translate([0,0,length+axis_slack+hol_w*5/2]) rotate([-90,0,0]) 
-        circular_M3_screws(10,90,width/2);
+    #translate([0,0,length+axis_slack+hol_w*3/2]) rotate([-90,0,0]) 
+        circular_M3_screws(30,45,width/2);
 
     // Stepper side screws
-    #translate([0,0,hol_w]) rotate([-90,0,0]) 
+    #translate([0,0,hol_w/2]) rotate([-90,0,0]) 
         circular_M3_screws(10,90,width/2);
+
+    // Long side holes - sorry for the +3...
+    #translate([-4/2-width/2,width/2-base_h-str_h/2+3,15+hol_w]) rotate([90,0,90])
+        for(x = [0:15:length+axis_slack-15-10])
+            translate([0,x,0]) cylinder(h=width+4,d=M3_d,$fn=12);
 }
+//!focuser_cover();
 
 module focuser_base()
 {
@@ -149,16 +156,16 @@ module focuser_base()
             cylinder(h=7,d=6,$fn=12);
         }
         // Screw holes
-        translate([0,0,-1])
+        #translate([0,0,-1])
         {
-            translate([5,3,0]) cylinder(h=10,d=M3_d,$fn=12);
-            translate([bot_screw_width-5,3,0]) cylinder(h=10,d=M3_d,$fn=12);
-            translate([5,length-3,0]) cylinder(h=10,d=M3_d,$fn=12);
-            translate([bot_screw_width-5,length-3,0]) cylinder(h=10,d=M3_d,$fn=12);
+            translate([5,3,0]) cylinder(h=base_h*2,d=M3_d,$fn=12);
+            translate([bot_screw_width-5,3,0]) cylinder(h=base_h*2,d=M3_d,$fn=12);
+            translate([5,length-3,0]) cylinder(h=base_h*2,d=M3_d,$fn=12);
+            translate([bot_screw_width-5,length-3,0]) cylinder(h=base_h*2,d=M3_d,$fn=12);
         }
         // Stepper space
         translate([width/2,0,base_h/2])
-            cube([18,12,base_h+2],center=true);
+            cube([18,9,base_h+2],center=true);
     }
     // Straighteners
     translate([0,0,5]) difference()
@@ -169,8 +176,8 @@ module focuser_base()
             cube([str_w,length+axis_slack,str_h]);
             translate([width-str_w,0,0]) cube([str_w,length+axis_slack,str_h]);
             // Screw support
-            for(ofs=[[0,0,0],[width-str_w2,0,0],[0,length+axis_slack-5,0],[width-str_w2,length+axis_slack-5,0]])
-                translate(ofs) cube([str_h,5,str_w2]);
+            for(ofs=[[0,0,0],[width-str_w2,0,0],[0,length+axis_slack-str_ext,0],[width-str_w2,length+axis_slack-str_ext,0]])
+                translate(ofs) cube([str_h,str_ext,str_w2]);
         }
         // Long side holes
         translate([-1,15,str_h/2]) rotate([0,90,0])
@@ -191,37 +198,37 @@ module focuser_stepper_holder() difference()
 {
     translate([0,stepper_center-20,0]) union() 
     {
-        cube([width,28,hol_w*2]);
+        cube([width,28,hol_w]);
         translate([width/2,28,0])
-            cylinder(h=hol_w*2,d=width);
+            cylinder(h=hol_w,d=width);
         // Assembly guide
-        translate([0,base_h+str_h,-5])
-            cube([str_w2,2,10]);
-        translate([width-str_w2,base_h+str_h,-5])
-            cube([str_w2,2,10]);
+        translate([0,base_h+str_h,-str_ext])
+            cube([str_w2/2,2,str_ext]);
+        translate([width-str_w2/2,base_h+str_h,-str_ext])
+            cube([str_w2/2,2,str_ext]);
     }
     // Space for Stepper cables
     //#translate([-10/2,-15/2,stepper_center-30+10/2+1]) cube([10,10,10]);
     percent=0.35;
-    translate([width*(1-percent)/2,30,-1])
+    translate([width*(1-percent)/2,32,-1])
         rotate([90,0,0]) cube([width*percent,hol_w*2+2,30]);
     translate([width/2,30,-1])
         rotate([0,0,90]) cylinder(d=28*1.01,h=hol_w*2+2,$fn=32);
     translate([width/2,30-10/2,hol_w])
         cube([28*1.01,10,hol_w*2+2],center=true);
-
+    
     // Stepper locks
-    translate([width/2,stepper_center,hol_w])
+    #translate([width/2,stepper_center,hol_w])
         for(ofs=[+35/2,-35/2])
             translate([ofs,0,0])
-                cylinder(h=hol_w*3,d=M3_d,center=true,$fn=12);
+                cylinder(h=hol_w*2,d=M3_d,center=true,$fn=12);
     
     // Narrow side screws
-    translate([0,str_h/2+5,str_h/2]) rotate([0,0,-90])
+    translate([0,str_h/2+5,0]) rotate([0,0,-90])
     {
-        translate([0,str_w+2,0]) cylinder(h=hol_w*2,d=M3_d,$fn=12);
-        translate([0,width-str_w-2,0]) cylinder(h=hol_w*2,d=M3_d,$fn=12);
-        translate([str_h-base_h/2,width/2,0]) cylinder(h=hol_w*2,d=M3_d,$fn=12);
+        translate([0,str_w+2,-1/2]) cylinder(h=hol_w+1,d=M3_d,$fn=12);
+        translate([0,width-str_w-2,-1/2]) cylinder(h=hol_w+1,d=M3_d,$fn=12);
+        translate([str_h-base_h/2,width/2,-1/2]) cylinder(h=hol_w+1,d=M3_d,$fn=12);
     }
     
     // Stepper location - we're interested in the larger shaft only, not the axis
@@ -231,7 +238,7 @@ module focuser_stepper_holder() difference()
                 stepper_28BYJ_48();
 
     // Stepper side screws for cover - longer than for cover
-    #translate([width/2,30-2,hol_w])
+    translate([width/2,30-2,hol_w/2])
         rotate([90,0,0])
             circular_M3_screws(20,90,20);
 }
@@ -245,10 +252,10 @@ module focuser_block_holder() difference()
         {
             cube([width,28,hol_w]);
             // Assembly guide
-            translate([0,base_h+str_h,0])
-                cube([str_w2,2,10]);
-            translate([width-str_w2,base_h+str_h,0])
-                cube([str_w2,2,10]);
+            translate([0,base_h+str_h,hol_w])
+                cube([str_w2,2,str_ext]);
+            translate([width-str_w2,base_h+str_h,hol_w])
+                cube([str_w2,2,str_ext]);
         }
         translate([0,28,0])
             cylinder(h=hol_w,d=width);
@@ -285,7 +292,7 @@ module focuser_holder()
     axis_offset = 17;
     
     // Cover for verification
-    *translate([0,-hol_w*2,width/2+3])
+    %translate([0,-hol_w,width/2+3])
         rotate([-90,0,0])
             focuser_cover();
 
@@ -526,11 +533,12 @@ module arduino_cover()
     }
 }
 
-focuser_holder();
-*translate([-10,0,14]) rotate([0,180,0]) focuser_stepper_holder();
+*focuser_holder();
+*translate([-10,0,hol_w]) rotate([0,180,0]) focuser_stepper_holder();
 *translate([+85,0,0]) focuser_block_holder();
 *focuser_base();
-*translate([0,-60,0]) focuser_cover();
+
+translate([0,0,0]) focuser_cover();
 
 *translate([0,-18,stepper_center])
     rotate([90,0,180])
