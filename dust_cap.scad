@@ -64,9 +64,12 @@ module cap_block(R,H,B) union()
             }
         }
         // Stepper axis
+        *rotate([0,180,0]) translate([0,24+M3_Head,-8])
+            rotate([90,0,0])
+                stepper_28BYJ_48();
         #translate([0,lever_w/2+0,0])
             rotate([90,0,0])
-                offset_hull([2,0,0])
+                offset_hull([5,0,0])
                 {
                     cylinder(d=6,h=1,$fn=16);
                     translate([0,0,lever_w/2])
@@ -74,18 +77,39 @@ module cap_block(R,H,B) union()
                 }
         // Screw with space for head and adjustment
         #translate([0,0,0]) union()
-            screw_space(M3_Head,4,M3_d,12,[2,0,0]);
+            screw_space(M3_Head,4,M3_d,12,[5,0,0]);
     }
 }
 
 module holder(R,H,B)
 {
     holder_w=0+R*0.1;
-    holder_h=60;
+    holder_h=70;
     stepper_ear_h=0.8;
-    translate([0,5.5+holder_w/2+M3_Head+stepper_ear_h,holder_w/2+10])
-        cube([50,1+holder_w,60],center=true);
+    side_offset=5.5+holder_w/2+M3_Head+stepper_ear_h;
+    difference()
+    {
+        translate([0,side_offset,holder_w/2+10])
+            cube([50,1+holder_w,holder_h],center=true);
+        %rotate([0,180,0])
+            translate([0,24+M3_Head,-8])
+                rotate([90,0,0])
+                    stepper_28BYJ_48();
+        #translate([0,side_offset,8])
+            rotate([90,180,0]) scale(1.01) offset_hull([0,10,0])
+            {
+                // Stepper space
+                cylinder(h=holder_w+stepper_ear_h+1,d=28,center=true);
+                translate([-14.6/2,-17,-(holder_w+stepper_ear_h+1)/2])
+                    cube([14.6,17,holder_w+stepper_ear_h+1]);
+                // Stepper screws
+                translate([-35/2,0,0])
+                    cylinder(d=M3_d,h=holder_w+stepper_ear_h+1,center=true,$fn=12);
+                translate([+35/2,0,0])
+                    cylinder(d=M3_d,h=holder_w+stepper_ear_h+1,center=true,$fn=12);
+            }
+    }
 }
 
 cap_block(lens_r,20,50);
-*holder(lens_r,20,50);
+holder(lens_r,20,50);
