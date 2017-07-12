@@ -148,9 +148,13 @@ module holder(R,H,B)
             translate([holder_d,holder_w*2,-5])
                 cube([holder_d,30,holder_h/2],center=true);
         }
+        // Argh, leave space for cap!
+        translate([0,0,-25])
+            cube([holder_d+5,30,holder_h/2],center=true);
     }
 }
 
 %translate([lever_l+lens_r,0,-20]) ED80T();
-cap_block(lens_r,20,50);
 holder(lens_r,20,50);
+rotate([0,180-180*sin(180*$t),0])
+    cap_block(lens_r,20,50);
