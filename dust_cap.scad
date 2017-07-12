@@ -52,11 +52,11 @@ module cap_block(R,H,B) union()
                 {
                     translate([-R-lever_l/2,0,10]) //hull()
                     {
-                        cube([lever_l*1.6-m_r*2,lever_w-m_r*2,H-m_r*2],center=true);
+                        cube([lever_l*1.8-m_r*2,lever_w-m_r*2,H-m_r*2],center=true);
                         //translate([0,0,-H/2+5/2])
                         //    cube([lever_l,lever_w*1.5,5],center=true);
                         translate([-lever_l/2,0,H-5])
-                            cube([lever_l*0.6-m_r*2,lever_w-m_r*2,H+10-m_r*2],center=true);
+                            cube([lever_l*0.8-m_r*2,lever_w-m_r*2,H+10-m_r*2],center=true);
                     }
                     sphere(d=m_r*2);
                 }
@@ -81,9 +81,13 @@ module cap_block(R,H,B) union()
                     translate([0,0,lever_w/2])
                         cube([5,2,lever_w],center=true);
                 }
-        // Screw with space for head and adjustment
-        #translate([0,0,0]) union()
+        // Screws with space for head and adjustment
+        #union()
+        {
             screw_space(M3_Head,4,M3_d,H/2+2,[lever_l/8,0,0]);
+            rotate([0,90,0]) screw_space(M3_Head,4,M3_d,lever_w+2);
+            rotate([0,-90,0]) screw_space(M3_Head,4,M3_d,lever_w+2);
+        }
     }
 }
 
