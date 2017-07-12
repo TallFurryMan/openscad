@@ -47,7 +47,7 @@ module cap_block(R,H,B) union()
         {
             union()
             {
-                cylinder(h=H+bot_h,d1=R*2+5,d2=R*2.1+5);
+                cylinder(h=H+bot_h,d1=R*2+5,d2=R*2.1+5,$fn=64);
                 minkowski()
                 {
                     translate([-R-lever_l/2,0,10]) //hull()
@@ -64,7 +64,7 @@ module cap_block(R,H,B) union()
             // Cap emptiness
             translate([0,0,bot_h+0.1]) union()
             {
-                cylinder(h=2*H+0.1,d1=R*2,d2=R*2.2);
+                cylinder(h=2*H+0.1,d1=R*2,d2=R*2.2,$fn=64);
                 /*translate([0,0,H])
                     cylinder(h=H,d=R*2.1);*/
             }
