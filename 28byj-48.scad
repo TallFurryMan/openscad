@@ -35,8 +35,8 @@ module axis()
         difference()
         {
             cylinder(h=10, d=5);
-            translate([-3,(+5-3)/2,4]) cube([3*2,2,6]);
-            translate([-3,(-5+3)/2-2,4]) cube([3*2,2,6]);
+            #translate([-3,(+5-3)/2,4]) cube([3*2,2,6]);
+            #translate([-3,(-5+3)/2-2,4]) cube([3*2,2,6]);
         }
     }
 }
