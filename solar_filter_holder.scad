@@ -83,6 +83,10 @@ module cap(scope_d=160) {
     space=scope_d/16;
     border=scope_d/40;
     // Use the scope diameter, not the outer circle diameter!
+    // Except printing is not precise enough...
+    // pi*d' = P + space = pi*d + space thus d' = d + space/pi
+    scope_dp=scope_d+/*border+*/space/PI;
+    opening_angle=asin(space/2/scope_dp);
     translate([0,0,0]) difference() {
         hull() {
             // cap itself
@@ -94,7 +98,7 @@ module cap(scope_d=160) {
                         cylinder(d=6, h=2);
         }
         // Cap inner hole
-        translate([0,0,-1]) cylinder(d=scope_d-border*2,h=4);
+        translate([0,0,-1]) cylinder(d=scope_d-border*3,h=4);
         // Screw holes for the cap
         for (a=[60,180,300])
             rotate([0,0,a])
@@ -108,6 +112,6 @@ scope_diameter=102;
 // Orion guidescope
 //scope_diameter=57;
 
-translate([0,scope_diameter*+1.1,1*height]) color("red") inner_circle(scope_d=scope_diameter, height=scope_diameter*0.6*2/3);
-translate([0,scope_diameter*+0.0,0*height]) color("blue") outer_circle(scope_d=scope_diameter, height=scope_diameter*0.6);
-translate([0,scope_diameter*-1.1,0]) color("green") cap(scope_d=scope_diameter);
+/*translate([0,scope_diameter*+1.1,1*height])*/ color("red") inner_circle(scope_d=scope_diameter, height=scope_diameter*0.6*2/3);
+//translate([0,scope_diameter*+0.0,0*height]) color("blue") outer_circle(scope_d=scope_diameter, height=scope_diameter*0.6);
+/*translate([0,scope_diameter*-1.1,0])*/ color("green") cap(scope_d=scope_diameter);
